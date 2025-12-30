@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import connectMongoDB from "@/app/lib/mongodb";
 import Asset from "@/app/models/asset-management/assets";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import Vendor from "@/app/models/asset-management/vendor";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/auth";
 import { writeFile, mkdir } from "fs/promises";
@@ -58,6 +60,7 @@ interface AssetData {
   warrantyExpiryDate?: string;
   file?: File;
   updatedBy?: string;
+  status?: string; // Added status field
   // Additional required fields from Asset model
   purchaseNumber?: string;
   source?: string;
@@ -160,19 +163,27 @@ export async function POST(request: Request) {
       "assginedTo",
     ];
     const missingFields = requiredFields.filter((field) => !data[field]);
-    
+
     // Also validate numeric and object fields
     const validationErrors: string[] = [];
-    
+
     if (missingFields.length > 0) {
-      validationErrors.push(`Missing required fields: ${missingFields.join(", ")}`);
+      validationErrors.push(
+        `Missing required fields: ${missingFields.join(", ")}`
+      );
     }
-    
+
     if (!data.purchasePrice || data.purchasePrice <= 0) {
-      validationErrors.push("purchasePrice is required and must be greater than 0");
+      validationErrors.push(
+        "purchasePrice is required and must be greater than 0"
+      );
     }
-    
-    if (!data.warrantyPeriod || (data.warrantyPeriod.years === undefined && data.warrantyPeriod.months === undefined)) {
+
+    if (
+      !data.warrantyPeriod ||
+      (data.warrantyPeriod.years === undefined &&
+        data.warrantyPeriod.months === undefined)
+    ) {
       validationErrors.push("warrantyPeriod is required (years and months)");
     }
 
@@ -291,6 +302,9 @@ export async function PUT(request: Request) {
           break;
         case "attachment":
           file = value as File;
+          break;
+        case "status":
+          updateData.status = value as string;
           break;
         default:
           if (isAssetStringField(key)) {

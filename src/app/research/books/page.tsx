@@ -13,6 +13,8 @@ import {
 } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import Link from "next/link";
+import { usePageMetadata } from "../../hooks/usePageMetadata";
+
 // Animation variants
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -66,6 +68,28 @@ export default function BooksPage() {
     page: 1,
     limit: 10,
     pages: 0,
+  });
+
+  // Use the metadata hook
+  usePageMetadata({
+    title: "Books & Monographs - Computer Science & Engineering, IIT Tirupati",
+    description:
+      "Discover books and monographs authored by faculty members of the Department of Computer Science & Engineering at IIT Tirupati.",
+    keywords: [
+      "Books",
+      "Monographs",
+      "CSE IIT Tirupati",
+      "Faculty Publications",
+      "Research Publications",
+    ],
+    ogTitle:
+      "Books & Monographs - Computer Science & Engineering, IIT Tirupati",
+    ogDescription:
+      "Discover books and monographs authored by faculty members of the Department of Computer Science & Engineering at IIT Tirupati.",
+    ogImage: "/assets/images/research-areas-og.png",
+    ogUrl: `${
+      process.env.NEXT_PUBLIC_SITE_URL || "https://cse.iittp.ac.in"
+    }/research/areas`,
   });
 
   useEffect(() => {
@@ -239,7 +263,10 @@ export default function BooksPage() {
 
                       {/* Content */}
                       <div className="p-4 md:p-5 flex-grow flex flex-col">
-                        <h2 className="text-lg md:text-xl font-semibold text-gray-800 mb-2 line-clamp-2"  title={book.title}>
+                        <h2
+                          className="text-lg md:text-xl font-semibold text-gray-800 mb-2 line-clamp-2"
+                          title={book.title}
+                        >
                           {book.title}
                         </h2>
 
@@ -262,17 +289,15 @@ export default function BooksPage() {
                               {book.facultyInvolved.map((faculty, index) => (
                                 <li key={index}>
                                   {faculty.institute ? (
-                                   
-                                   <Link
-                                   key={faculty._id}
-                                   href={`/people/faculty/${faculty.institute}`}
-                                   target="_blank"
-                                   rel="noopener noreferrer"
-                                   className="inline-flex items-center px-2.5 py-0.5  rounded-full text-xs font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors cursor-pointer"
-                                 >
-                                   {faculty.name}
-                                 </Link>
-                                   
+                                    <Link
+                                      key={faculty._id}
+                                      href={`/people/faculty/${faculty.institute}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center px-2.5 py-0.5  rounded-full text-xs font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors cursor-pointer"
+                                    >
+                                      {faculty.name}
+                                    </Link>
                                   ) : (
                                     faculty.name
                                   )}

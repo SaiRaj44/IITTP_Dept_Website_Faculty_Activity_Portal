@@ -1,10 +1,11 @@
 import './globals.css';
 import type { Metadata } from 'next';
-
-import AuthProvider from "./context/AuthProvider";
+import { MetadataProvider } from './context/MetadataProvider';
+import ClientLayout from './ClientLayout';
 
 const siteBase = process.env.NEXT_PUBLIC_SITE_URL || 'https://cse.iittp.ac.in';
 
+// Default metadata (can be overridden by client)
 export const metadata: Metadata = {
   title: 'Computer Science & Engineering',
   description: 'Department of Computer Science & Engineering at IIT Tirupati',
@@ -37,14 +38,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head />
       <body suppressHydrationWarning>
-        <AuthProvider>
-          <div className="flex flex-col min-h-screen">
-            <main className="flex-grow">
-              {children}
-            </main>
-          </div>
-        </AuthProvider>
+        <MetadataProvider>
+          <ClientLayout>{children}</ClientLayout>
+        </MetadataProvider>
       </body>
     </html>
   );

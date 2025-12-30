@@ -8,6 +8,7 @@ import Image from "next/image";
 export default function SignInForm() {
   const searchParams = useSearchParams();
   const callbackUrlParam = searchParams?.get("callbackUrl");
+
   const callbackUrl = callbackUrlParam
     ? new URL(callbackUrlParam, window.location.origin).toString()
     : new URL("", window.location.origin).toString();

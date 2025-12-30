@@ -12,6 +12,9 @@ import {
   LightBulbIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
+import { usePageMetadata } from "../../hooks/usePageMetadata"; 
+
+
 // Animation variants
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -268,6 +271,17 @@ export default function AreasPage() {
   // const [hoveredId, setHoveredId] = useState<number | null>(null);
   const [isMounted, setIsMounted] = useState(false);
 
+  // Use the metadata hook
+  usePageMetadata({
+    title: 'Research Areas - Computer Science & Engineering, IIT Tirupati',
+    description: 'Explore the diverse research areas in the Department of Computer Science & Engineering at IIT Tirupati. Learn about AI, Machine Learning, Cloud Computing, and more.',
+    keywords: ['Research Areas', 'CSE Research', 'AI Research', 'Machine Learning', 'Cloud Computing', 'Computer Networks', 'Computer Vision', 'IoT', 'VLSI', 'Software Engineering', 'Algorithms', 'Data Structures', 'High Performance Computing', 'Wireless Networks', 'Stochastic Optimization', 'Reinforcement Learning'],
+    ogTitle: 'Research Areas - Computer Science & Engineering, IIT Tirupati',
+    ogDescription: 'Explore the diverse research areas in the Department of Computer Science & Engineering at IIT Tirupati.',
+    ogImage: '/assets/images/research-areas-og.png',
+    ogUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://cse.iittp.ac.in'}/research/areas`,
+  });
+  
   // Use useEffect to handle client-side only code
   useEffect(() => {
     setIsMounted(true);
