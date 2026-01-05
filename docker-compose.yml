@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # Next.js web application
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: deptflow
+    container_name: deptflow-web
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongodb:27017/cse
+      - NEXTAUTH_URL=https://cse.iittp.ac.in
+      - NEXT_PUBLIC_API_URL=https://cse.iittp.ac.in
+    depends_on:
+      - mongodb
+    networks:
+      - deptflow-network
+
+  # MongoDB service
+  mongodb:
+    image: mongo:6
+    container_name: deptflow-mongodb
+    restart: always
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./init-mongo:/docker-entrypoint-initdb.d
+    networks:
+      - deptflow-network
+
+  # Backup service (runs weekly)
+  backup:
+    image: mongo:6
+    container_name: deptflow-backup
+    restart: always
+    volumes:
+      - ./backups:/backup
+      - ./backup-archive:/backup-archive
+      - ./backup-mongodb.sh:/backup-script/backup-mongodb.sh
+    command: >
+      sh -c '
+      echo "Setting up weekly backup cron job..."
+      chmod +x /backup-script/backup-mongodb.sh
+      echo "0 0 * * 0 /backup-script/backup-mongodb.sh" > /etc/crontabs/root
+      crond -f -l 2
+      '
+    depends_on:
+      - mongodb
+    networks:
+      - deptflow-network
+
+networks:
+  deptflow-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:

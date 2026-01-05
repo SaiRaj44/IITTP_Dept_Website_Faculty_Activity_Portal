@@ -1,0 +1,20 @@
+docker exec -it deptflow-mongodb mongosh
+show dbs;
+use cse;
+show collections;
+db.publications.find(
+  { title: "ForgetMeNot: Understanding and Modeling the Impact of Forever Chemicals Toward Sustainable Large-Scale Computing" }
+).pretty()
+db.publications.updateOne(
+  { 
+    title: "ForgetMeNot: Understanding and Modeling the Impact of Forever Chemicals Toward Sustainable Large-Scale Computing",
+    "facultyInvolved.name": "Dr. Ragavendra Kanakagiri"
+  },
+  { 
+    $set: { "facultyInvolved.$.name": "Dr. Raghavendra Kanakagiri" }
+  }
+)
+db.publications.find(
+  { title: "ForgetMeNot: Understanding and Modeling the Impact of Forever Chemicals Toward Sustainable Large-Scale Computing" },
+  { facultyInvolved: 1 }
+).pretty()

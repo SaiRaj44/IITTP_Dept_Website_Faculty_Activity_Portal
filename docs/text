@@ -1,0 +1,1 @@
+pkill -f "next dev" || echo "No Next.js server to kill"

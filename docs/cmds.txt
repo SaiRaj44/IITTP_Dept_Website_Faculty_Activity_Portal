@@ -1,0 +1,41 @@
+npm install -g npm-check-updates
+ncu -u
+npm install
+npm run build
+npm run start
+
+step1: npm install -g npm-check-updates
+step2: ncu -u
+step3: npm install
+step4: npm run build
+step5: ./export-mongodb.sh
+step6: docker-compose up -d
+step7: docker-compose down
+git config --global user.email "you@example.com"
+git config --global user.name "Your Name"
+
+which kubectl && kubectl version --client
+curl -LO "https://dl.k8s.io/release/stable.txt" && KUBECTL_VERSION=$(cat stable.txt) && curl -LO "https://dl.k8s.io/release/$KUBECTL_VERSION/bin/linux/amd64/kubectl" && chmod +x kubectl && sudo mv kubectl /usr/local/bin/
+kubectl cluster-info
+
+It looks like you have kubectl installed, but you don't have an active Kubernetes cluster running. Let's set up a local Kubernetes cluster using Minikube and then deploy your application.
+
+First, let's check if Minikube is installed:
+
+Ran terminal command
+~/…/IITTP_Dept_WebsiteWorking directory: ~/Downloads/IITTP_Dept_Website $ which minikube
+
+Relocate
+
+Not auto-run
+Thought Process
+
+
+I see you don't have Minikube installed yet. Let's install Minikube to set up a local Kubernetes cluster for running your application.
+
+First, let's install Minikube:
+
+Suggested terminal command
+~/…/IITTP_Dept_Website $ curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 && sudo install minikube-linux-amd64 /usr/local/bin/minikube
+
+k3d cluster create deptflow-cluster --agents 1 --registry-create deptflow-registry:0.0.0.0:5000 --port 8080:80@loadbalancer
