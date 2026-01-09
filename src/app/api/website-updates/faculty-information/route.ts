@@ -86,6 +86,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Validate profileUrl format (should be a slug, not a full URL)
+    if (body.profileUrl && (body.profileUrl.startsWith('http') || body.profileUrl.includes('://'))) {
+      return NextResponse.json(
+        { success: false, error: "Profile URL should be a slug (e.g., 'dr-john-doe'), not a full URL" },
+        { status: 400 }
+      );
+    }
+
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(body.email)) {
@@ -144,6 +152,14 @@ export async function PUT(req: NextRequest) {
     if (!body.name || !body.designation || !body.category || !body.email || !body.imageUrl || !body.researchInterests) {
       return NextResponse.json(
         { success: false, error: "Missing required fields" },
+        { status: 400 }
+      );
+    }
+
+    // Validate profileUrl format (should be a slug, not a full URL)
+    if (body.profileUrl && (body.profileUrl.startsWith('http') || body.profileUrl.includes('://'))) {
+      return NextResponse.json(
+        { success: false, error: "Profile URL should be a slug (e.g., 'dr-john-doe'), not a full URL" },
         { status: 400 }
       );
     }

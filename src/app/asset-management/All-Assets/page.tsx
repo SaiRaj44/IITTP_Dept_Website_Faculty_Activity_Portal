@@ -126,6 +126,39 @@ export default function AssetsPage() {
   });
 
   const totalPages = Math.ceil(filteredAssets.length / itemsPerPage);
+  const maxVisiblePages = 10;
+  const getPageItems = () => {
+    const items: (number | string)[] = [];
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) items.push(i);
+      return items;
+    }
+
+    const sidePages = 2; // always show first & last and a small buffer
+    const windowSize = maxVisiblePages - (sidePages * 2 + 2); // reserve spots for edges and 2 ellipses
+    const halfWindow = Math.floor(windowSize / 2);
+
+    let left = Math.max(2, currentPage - halfWindow);
+    let right = Math.min(totalPages - 1, currentPage + halfWindow);
+
+    // adjust window if it's clipped at one end
+    if (currentPage - left < halfWindow) {
+      right = Math.min(totalPages - 1, right + (halfWindow - (currentPage - left)));
+    }
+    if (right - currentPage < halfWindow) {
+      left = Math.max(2, left - (halfWindow - (right - currentPage)));
+    }
+
+    items.push(1);
+    if (left > 2) items.push("left-ellipsis");
+
+    for (let i = left; i <= right; i++) items.push(i);
+
+    if (right < totalPages - 1) items.push("right-ellipsis");
+    items.push(totalPages);
+
+    return items;
+  };
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedAssets = filteredAssets
     .slice(startIndex, startIndex + itemsPerPage)
@@ -353,13 +386,13 @@ export default function AssetsPage() {
                       scope="col"
                       className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                     >
-                      Serial Number
+                      Assigned To
                     </th>
                     <th
                       scope="col"
                       className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                     >
-                      Warranty Expiry
+                      Serial Number
                     </th>
                     <th
                       scope="col"
@@ -401,13 +434,11 @@ export default function AssetsPage() {
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                         {asset.custodian || "Unassigned"}
                       </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        {asset.serialNumber}
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                       {asset.assginedTo}
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        {new Date(
-                          asset.warrantyExpiryDate
-                        ).toLocaleDateString()}
+                        {asset.serialNumber}
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                         <span
@@ -499,19 +530,33 @@ export default function AssetsPage() {
               >
                 Previous
               </button>
-              {[...Array(totalPages)].map((_, i) => (
-                <button
-                  key={i + 1}
-                  onClick={() => setCurrentPage(i + 1)}
-                  className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
-                    currentPage === i + 1
-                      ? "z-10 bg-blue-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
-                      : "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                  }`}
-                >
-                  {i + 1}
-                </button>
-              ))}
+              {getPageItems().map((item, idx) => {
+                if (item === "left-ellipsis" || item === "right-ellipsis") {
+                  return (
+                    <span
+                      key={`e-${idx}`}
+                      className="relative inline-flex items-center px-4 py-2 text-sm text-gray-700"
+                    >
+                      …
+                    </span>
+                  );
+                }
+
+                const pageNum = Number(item);
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
+                      currentPage === pageNum
+                        ? "z-10 bg-blue-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                        : "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
               <button
                 onClick={() =>
                   setCurrentPage((prev) => Math.min(prev + 1, totalPages))

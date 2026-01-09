@@ -79,10 +79,10 @@ export default function FacultyInformationModal({
     },
     {
       name: "profileUrl",
-      label: "Profile URL",
+      label: "Profile URL Slug",
       type: "text",
       required: true,
-      placeholder: "Enter profile URL",
+      placeholder: "Enter profile URL slug (e.g., dr-john-doe)",
     },
     {
       name: "office",

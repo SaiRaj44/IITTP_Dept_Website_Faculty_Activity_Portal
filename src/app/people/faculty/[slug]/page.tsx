@@ -51,10 +51,26 @@ export async function generateMetadata(props: any): Promise<Metadata> {
     const image = faculty.imageUrl ? (faculty.imageUrl.startsWith("http") ? faculty.imageUrl : `${siteBase}${faculty.imageUrl}`) : `${siteBase}/assets/images/iittp-logo.png`;
     const url = `${siteBase}/people/faculty/${slug}`;
 
+    // Generate dynamic keywords
+    const dynamicKeywords = [
+      faculty.name,
+      "CSE IIT Tirupati",
+      `${kewyworddesignation} - CSE`,
+      keywordresearch,
+      "IIT Tirupati faculty",
+      "Department of CSE",
+      "Computer Science Engineering",
+      "IITTP faculty profile",
+      "Official Faculty Profile",
+    ].filter(Boolean);
+
     return {
       title,
       description,
-      keywords: [formattedSlug, "CSE faculty IIT Tirupati", kewyworddesignation, keywordresearch].filter(Boolean) as string[],
+      keywords: dynamicKeywords as string[],
+      alternates: {
+        canonical: url,
+      },
       openGraph: {
         title,
         description,

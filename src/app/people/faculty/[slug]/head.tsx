@@ -12,7 +12,7 @@ type MinimalFaculty = {
 
 export default async function Head({ params }: Props) {
   const { slug } = params;
-  const siteBase = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const siteBase = process.env.NEXT_PUBLIC_SITE_URL || "https://cse.iittp.ac.in";
 
   try {
     const res = await fetch(`${siteBase}/api/public/faculty-information?limit=500`, {
@@ -47,7 +47,7 @@ export default async function Head({ params }: Props) {
         <meta property="og:description" content={description} />
         <meta property="og:type" content="profile" />
         <meta property="og:url" content={url} />
-        <meta property="og:image" content={image} />
+        <meta property="og:image" content={`${image} - siairaj`} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
 

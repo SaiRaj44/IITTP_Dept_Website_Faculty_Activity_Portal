@@ -345,7 +345,8 @@ const fetchPHPPublications = async (): Promise<PHPPublication[]> => {
 // Fetch slider images from local API
 const fetchSliderImages = async () => {
   try {
-    const response = await fetch(`http://localhost:8080/sai/sliders/`, {
+    const response = await fetch(`https://cse.iittp.ac.in/sai/sliders/`, {
+    // const response = await fetch(`http://localhost:8080/sai/sliders/`, {
       headers: {
         Accept: "application/json",
       },
@@ -359,18 +360,35 @@ const fetchSliderImages = async () => {
 
     const data = await response.json();
     const sliders = Array.isArray(data) ? data : data.sliders || data.data || [];
-    
+
     // Map the API response to SliderImage interface
-    const mappedSliders = sliders.map((item: APISliderItem) => ({
-      _id: item.id,
-      title: item.title,
-      caption: item.description,
-      imageUrl: item.image_url,
-      linkUrl: undefined,
-      isActive: true, // Assuming all fetched sliders are active
-      createdAt: item.created_at,
-      updatedAt: item.created_at,
-    }));
+    const mappedSliders = sliders.map((item: APISliderItem) => {
+      let imageUrl = item.image_url || "";
+      // If the image_url is a relative path (starts with '/'), prepend the API host
+      if (imageUrl && !/^https?:\/\//i.test(imageUrl)) {
+        const host = "https://cse.iittp.ac.in";
+        // Some images live under /activity-report/uploads on the server
+        if (imageUrl.startsWith("/activity-report")) {
+          imageUrl = `${host}${imageUrl}`;
+        } else if (imageUrl.startsWith("/uploads")) {
+          // prefer the activity-report prefix for upload assets
+          imageUrl = `${host}/activity-report${imageUrl}`;
+        } else {
+          imageUrl = imageUrl.startsWith("/") ? `${host}${imageUrl}` : `${host}/${imageUrl}`;
+        }
+      }
+
+      return {
+        _id: item.id,
+        title: item.title,
+        caption: item.description,
+        imageUrl,
+        linkUrl: undefined,
+        isActive: true, // Assuming all fetched sliders are active
+        createdAt: item.created_at,
+        updatedAt: item.created_at,
+      };
+    });
 
     // Sort by createdAt descending and take the most recent 10
     return mappedSliders
