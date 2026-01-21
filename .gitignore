@@ -64,3 +64,4 @@ build/
 *.log
 .env
 .env
+client.tar.gz
