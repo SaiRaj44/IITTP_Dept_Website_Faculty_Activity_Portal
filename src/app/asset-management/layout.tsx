@@ -34,7 +34,7 @@ export default function AssetManagementLayout({
     return null;
   }
 
-  const userRole = session.user?.role || "user";
+  // const userRole = session.user?.role || "user";
 
   return (
     <div className="flex flex-col h-screen p-4 bg-gray-50">
@@ -84,8 +84,8 @@ export default function AssetManagementLayout({
             )}
 
             {/* Faculty-only menus */}
-            {userRole === "faculty" && (
-              <>
+            {/* {userRole === "facutly" && (
+              <> */}
                 <li className="cursor-pointer flex items-center py-2 px-3 rounded transition duration-200 hover:bg-gray-600 hover:scale-105">
                   <FaStore className="w-5 h-5 mr-2" />
                   <Link href="/asset-management/vendors">
@@ -98,8 +98,8 @@ export default function AssetManagementLayout({
                     <span className="flex-1 text-sm">Locations</span>
                   </Link>
                 </li>
-              </>
-            )}
+              {/* </>
+            )} */}
           </ul>
         </nav>
 

@@ -64,6 +64,14 @@ export default function WebsiteUpdatesPage() {
       color: "bg-gradient-to-br from-blue-400 to-orange-600",
     },
     {
+      title: "Newsletter",
+      description: "Create and manage department newsletters",
+      icon: "📧",
+      href: "/website-updates/newsletter",
+      category: "announcements",
+      color: "bg-gradient-to-br from-green-400 to-green-600",
+    },
+    {
       title: "Slider Images",
       description: "Manage slider images for the department website",
       icon: "🖼️",

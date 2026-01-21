@@ -27,6 +27,7 @@ export default function AssetsPage() {
     location: "",
     status: "",
     category: "",
+    subcategory: "",
     search: "",
   });
   const [isViewMode, setIsViewMode] = useState(false);
@@ -117,16 +118,51 @@ export default function AssetsPage() {
     const matchesStatus = !filters.status || asset.status === filters.status;
     const matchesCategory =
       !filters.category || asset.category === filters.category;
+    const matchesSubcategory =
+      !filters.subcategory || asset.subcategory === filters.subcategory;
     const matchesSearch =
       !filters.search ||
       asset.assetName.toLowerCase().includes(filters.search.toLowerCase()) ||
       asset.assetId.toLowerCase().includes(filters.search.toLowerCase()) ||
       asset.brand.toLowerCase().includes(filters.search.toLowerCase());
 
-    return matchesLocation && matchesStatus && matchesCategory && matchesSearch;
+    return matchesLocation && matchesStatus && matchesCategory && matchesSubcategory && matchesSearch;
   });
 
   const totalPages = Math.ceil(filteredAssets.length / itemsPerPage);
+  const maxVisiblePages = 10;
+  const getPageItems = () => {
+    const items: (number | string)[] = [];
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) items.push(i);
+      return items;
+    }
+
+    const sidePages = 2; // always show first & last and a small buffer
+    const windowSize = maxVisiblePages - (sidePages * 2 + 2); // reserve spots for edges and 2 ellipses
+    const halfWindow = Math.floor(windowSize / 2);
+
+    let left = Math.max(2, currentPage - halfWindow);
+    let right = Math.min(totalPages - 1, currentPage + halfWindow);
+
+    // adjust window if it's clipped at one end
+    if (currentPage - left < halfWindow) {
+      right = Math.min(totalPages - 1, right + (halfWindow - (currentPage - left)));
+    }
+    if (right - currentPage < halfWindow) {
+      left = Math.max(2, left - (halfWindow - (right - currentPage)));
+    }
+
+    items.push(1);
+    if (left > 2) items.push("left-ellipsis");
+
+    for (let i = left; i <= right; i++) items.push(i);
+
+    if (right < totalPages - 1) items.push("right-ellipsis");
+    items.push(totalPages);
+
+    return items;
+  };
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedAssets = filteredAssets
     .slice(startIndex, startIndex + itemsPerPage)
@@ -304,6 +340,35 @@ export default function AssetsPage() {
               {Object.keys(assetCategories).map((category) => (
                 <option key={category} value={category}>
                   {category}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label
+              htmlFor="subcategory"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Subcategory
+            </label>
+            <select
+              id="subcategory"
+              name="subcategory"
+              value={filters.subcategory}
+              onChange={(e) =>
+                setFilters((prev) => ({ ...prev, subcategory: e.target.value }))
+              }
+              className="mt-1 block w-full rounded-md text-black border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            >
+              <option value="">All Subcategories</option>
+              {filters.category && assetCategories[filters.category as keyof typeof assetCategories]?.map((sub) => (
+                <option key={sub} value={sub}>
+                  {sub}
+                </option>
+              ))}
+              {!filters.category && Object.values(assetCategories).flat().map((sub) => (
+                <option key={sub} value={sub}>
+                  {sub}
                 </option>
               ))}
             </select>
@@ -496,19 +561,32 @@ export default function AssetsPage() {
               >
                 Previous
               </button>
-              {[...Array(totalPages)].map((_, i) => (
-                <button
-                  key={i + 1}
-                  onClick={() => setCurrentPage(i + 1)}
-                  className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
-                    currentPage === i + 1
+              {getPageItems().map((item, idx) => {
+                if (item === "left-ellipsis" || item === "right-ellipsis") {
+                  return (
+                    <span
+                      key={`e-${idx}`}
+                      className="relative inline-flex items-center px-4 py-2 text-sm text-gray-700"
+                    >
+                      …
+                    </span>
+                  );
+                }
+
+                const pageNum = Number(item);
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${currentPage === pageNum
                       ? "z-10 bg-blue-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
                       : "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                  }`}
-                >
-                  {i + 1}
-                </button>
-              ))}
+                      }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
               <button
                 onClick={() =>
                   setCurrentPage((prev) => Math.min(prev + 1, totalPages))

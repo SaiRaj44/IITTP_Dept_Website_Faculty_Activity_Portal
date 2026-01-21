@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import {
   FunnelIcon,
@@ -27,6 +28,7 @@ export default function AssetsPage() {
     location: "",
     status: "",
     category: "",
+    subcategory: "",
     search: "",
   });
   const [showFilters, setShowFilters] = useState(false);
@@ -70,6 +72,25 @@ export default function AssetsPage() {
       console.error("Error fetching locations:", error);
     }
   };
+
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    // Read URL query params for initial filters
+    const category = searchParams.get("category") || "";
+    const subcategory = searchParams.get("subcategory") || "";
+    const status = searchParams.get("status") || "";
+
+    if (category || subcategory || status) {
+      setFilters((prev) => ({
+        ...prev,
+        category,
+        subcategory,
+        status,
+      }));
+      setShowFilters(true);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     fetchAssets();
@@ -116,13 +137,15 @@ export default function AssetsPage() {
     const matchesStatus = !filters.status || asset.status === filters.status;
     const matchesCategory =
       !filters.category || asset.category === filters.category;
+    const matchesSubcategory =
+      !filters.subcategory || asset.subcategory === filters.subcategory;
     const matchesSearch =
       !filters.search ||
       asset.assetName.toLowerCase().includes(filters.search.toLowerCase()) ||
       asset.assetId.toLowerCase().includes(filters.search.toLowerCase()) ||
       asset.brand.toLowerCase().includes(filters.search.toLowerCase());
 
-    return matchesLocation && matchesStatus && matchesCategory && matchesSearch;
+    return matchesLocation && matchesStatus && matchesCategory && matchesSubcategory && matchesSearch;
   });
 
   const totalPages = Math.ceil(filteredAssets.length / itemsPerPage);
@@ -341,6 +364,35 @@ export default function AssetsPage() {
                 ))}
               </select>
             </div>
+            <div>
+              <label
+                htmlFor="subcategory"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Subcategory
+              </label>
+              <select
+                id="subcategory"
+                name="subcategory"
+                value={filters.subcategory}
+                onChange={(e) =>
+                  setFilters((prev) => ({ ...prev, subcategory: e.target.value }))
+                }
+                className="mt-1 block w-full rounded-md text-black border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              >
+                <option value="">All Subcategories</option>
+                {filters.category && assetCategories[filters.category as keyof typeof assetCategories]?.map((sub) => (
+                  <option key={sub} value={sub}>
+                    {sub}
+                  </option>
+                ))}
+                {!filters.category && Object.values(assetCategories).flat().map((sub) => (
+                  <option key={sub} value={sub}>
+                    {sub}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
       )}
@@ -434,8 +486,8 @@ export default function AssetsPage() {
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                         {asset.custodian || "Unassigned"}
                       </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                       {asset.assginedTo}
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        {asset.assginedTo}
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                         {asset.serialNumber}
@@ -547,11 +599,10 @@ export default function AssetsPage() {
                   <button
                     key={pageNum}
                     onClick={() => setCurrentPage(pageNum)}
-                    className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
-                      currentPage === pageNum
-                        ? "z-10 bg-blue-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
-                        : "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                    }`}
+                    className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${currentPage === pageNum
+                      ? "z-10 bg-blue-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                      : "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+                      }`}
                   >
                     {pageNum}
                   </button>
