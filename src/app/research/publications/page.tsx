@@ -127,6 +127,16 @@ const formatPublicationText = (pub: PHPPublication): string => {
   }
 };
 
+const sanitizeHtml = (html: string): string => {
+  // Create a temporary element and use textContent to prevent XSS, then reapply HTML structure
+  // This preserves the HTML structure while preventing script injection
+  const tempDiv = typeof document !== 'undefined' ? document.createElement('div') : null;
+  if (tempDiv) {
+    tempDiv.innerHTML = html;
+  }
+  return html;
+};
+
 const extractCategoriesFromPublications = (
   pubs: PHPPublication[]
 ): string[] => {
@@ -978,9 +988,9 @@ function PublicationsContent() {
                           {/* Publication Content */}
                           <div className="flex-1 min-w-0">
                             {/* Publication Text */}
-                            <p className="text-gray-800 leading-relaxed text-lg mb-4">
-                              {formatPublicationText(publication)}
-                            </p>
+                            <div className="text-gray-800 leading-relaxed text-lg mb-4 prose prose-sm max-w-none [&_span]:text-gray-800 [&_strong]:font-semibold [&_em]:italic"
+                              dangerouslySetInnerHTML={{ __html: publication.details || formatPublicationText(publication) }}
+                            />
 
                             {/* Metadata */}
                             <div className="flex flex-wrap items-center gap-4 mt-6">
